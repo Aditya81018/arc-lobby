@@ -6,6 +6,7 @@ export interface Lobby {
 }
 
 const lobbies = new Map<string, Lobby>();
+const userToLobby = new Map<string, string>();
 
 // Controllers
 export function getAllLobbies() {
@@ -38,12 +39,24 @@ export function deleteLobby(lobbyId: string) {
   return lobbies.delete(lobbyId);
 }
 
+// Helpers
+
+export function getLobbyOfUser(userId: string) {
+  const lobbyId = userToLobby.get(userId);
+  if (!lobbyId) return;
+
+  const lobby = getLobbyById(lobbyId);
+  return lobby;
+}
+
 export function joinLobby(lobbyId: string, userId: string) {
   const lobby = getLobbyById(lobbyId);
   if (!lobby) return false;
   if (lobby.members.includes(userId)) return false;
 
   updateLobby(lobbyId, { members: [...lobby?.members, userId] });
+  userToLobby.set(userId, lobbyId);
+  console.log("Lobby Join - User-", userId, "| Lobby-", lobby.id);
   return true;
 }
 
@@ -55,7 +68,10 @@ export function leaveLobby(lobbyId: string, userId: string) {
   if (index === -1) return false;
 
   lobby.members.splice(index, 1);
+  userToLobby.delete(userId);
   if (lobby.members.length === 0) deleteLobby(lobbyId);
+
+  console.log("Lobby Leave - User-", userId, "| Lobby-", lobby.id);
   return true;
 }
 
@@ -71,18 +87,8 @@ lobbiesRouter.post("/", (_req, res) => {
   res.json(newLobby);
 });
 
-lobbiesRouter.post("/:id/join", (req, res) => {
+lobbiesRouter.get("/:id", (req, res) => {
   const { id: lobbyId } = req.params;
-  const { userId } = req.body;
-
-  const success = joinLobby(lobbyId, userId);
-  res.json(success);
-});
-
-lobbiesRouter.post("/:id/leave", (req, res) => {
-  const { id: lobbyId } = req.params;
-  const { userId } = req.body;
-
-  const success = leaveLobby(lobbyId, userId);
-  res.json(success);
+  const lobby = getLobbyById(lobbyId);
+  res.json(lobby || null);
 });

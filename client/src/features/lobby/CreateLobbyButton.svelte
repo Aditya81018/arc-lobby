@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { createLobby } from './controllers';
 
 	let isLoading = $state(false);
@@ -8,6 +10,7 @@
 		const lobby = await createLobby();
 		console.log('created lobby', lobby);
 
+		goto(resolve(`/${lobby.id}`));
 		isLoading = false;
 	}
 </script>

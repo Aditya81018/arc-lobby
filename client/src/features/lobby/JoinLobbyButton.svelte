@@ -1,28 +1,49 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import { getLobbyById } from './controllers';
+
 	let modal: HTMLDialogElement;
-	let lobbyID = '';
+	let lobbyId = $state('');
+	let isLoading = $state(false);
+	let isLobbyIdValid = $derived(lobbyId.length === 6);
+	let alertMessage = $state('');
 
 	function handleInput() {
-		lobbyID = lobbyID
+		alertMessage = '';
+		lobbyId = lobbyId
 			.toUpperCase()
 			.replace(/[^A-Z0-9]/g, '')
 			.slice(0, 6);
+	}
+
+	async function handleSubmit() {
+		isLoading = true;
+		const lobby = await getLobbyById(lobbyId);
+		if (lobby) goto(resolve(`/${lobbyId}`));
+		else alertMessage = 'Invalid Lobby Id';
+		isLoading = false;
 	}
 </script>
 
 <button class="btn btn-secondary" onclick={() => modal.showModal()}>Join Lobby</button>
 <dialog bind:this={modal} class="modal">
 	<div class="modal-box">
-		<div class="flex flex-col items-center justify-center gap-4">
+		<form onsubmit={handleSubmit} class="flex flex-col items-center justify-center gap-4">
 			<h3 class="text-lg font-medium">Enter Lobby ID</h3>
 			<input
 				class="input text-center font-mono"
 				placeholder="A1B2C3"
-				bind:value={lobbyID}
+				bind:value={lobbyId}
 				oninput={handleInput}
 			/>
-			<button class="btn btn-wide btn-secondary">Join</button>
-		</div>
+			<button
+				disabled={alertMessage !== '' || isLoading || !isLobbyIdValid}
+				type="submit"
+				class="btn btn-wide btn-secondary"
+				>{alertMessage ? alertMessage : !isLoading ? 'Join Lobby' : 'Joining Lobby...'}</button
+			>
+		</form>
 		<form method="dialog">
 			<button class="btn absolute top-2 right-2 btn-circle btn-ghost btn-sm">✕</button>
 		</form>

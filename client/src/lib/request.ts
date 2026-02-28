@@ -2,7 +2,7 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export default async function request<T = unknown>(
   endpoint: string,
-  method: HttpMethod,
+  method: HttpMethod = 'GET',
   data?: unknown
 ): Promise<T> {
   const options: RequestInit = {
