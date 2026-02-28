@@ -3,9 +3,19 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import { socket } from '$lib/socket';
 
+	let isLoading = $state(true);
+
 	let { children } = $props();
 	socket.connect();
+	socket.on('connect', () => {
+		isLoading = false;
+	});
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
-{@render children()}
+
+{#if isLoading}
+	<div>Connecting to server...</div>
+{:else}
+	{@render children()}
+{/if}

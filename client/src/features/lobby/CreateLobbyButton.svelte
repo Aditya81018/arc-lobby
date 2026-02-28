@@ -8,7 +8,6 @@
 		isLoading = true;
 
 		const lobby = await createLobby();
-		console.log('created lobby', lobby);
 
 		goto(resolve(`/${lobby.id}`));
 		isLoading = false;

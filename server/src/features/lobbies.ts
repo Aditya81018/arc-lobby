@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getUserById } from "./users";
 
 export interface Lobby {
   id: string;
@@ -56,7 +57,6 @@ export function joinLobby(lobbyId: string, userId: string) {
 
   updateLobby(lobbyId, { members: [...lobby?.members, userId] });
   userToLobby.set(userId, lobbyId);
-  console.log("Lobby Join - User-", userId, "| Lobby-", lobby.id);
   return true;
 }
 
@@ -71,8 +71,18 @@ export function leaveLobby(lobbyId: string, userId: string) {
   userToLobby.delete(userId);
   if (lobby.members.length === 0) deleteLobby(lobbyId);
 
-  console.log("Lobby Leave - User-", userId, "| Lobby-", lobby.id);
   return true;
+}
+
+export function getLobbyMembersData(lobbyId: string) {
+  const lobby = getLobbyById(lobbyId);
+  if (!lobby) return undefined;
+
+  const membersData = [];
+  for (const member of lobby.members) {
+    membersData.push(getUserById(member));
+  }
+  return membersData;
 }
 
 // Routes
@@ -91,4 +101,10 @@ lobbiesRouter.get("/:id", (req, res) => {
   const { id: lobbyId } = req.params;
   const lobby = getLobbyById(lobbyId);
   res.json(lobby || null);
+});
+
+lobbiesRouter.get("/:id/members", (req, res) => {
+  const { id: lobbyId } = req.params;
+  const membersData = getLobbyMembersData(lobbyId);
+  res.json(membersData || null);
 });
