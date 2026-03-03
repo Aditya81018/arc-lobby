@@ -18,7 +18,6 @@
 				return;
 			}
 			$lobbyStore.members = members;
-			console.log('member update', members);
 			$membersStore = await getMembersData($lobbyStore.id);
 		}
 

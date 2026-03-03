@@ -18,3 +18,8 @@ socket.on('new-message', (message: Message) => {
 		lobbyMessagesStore.update((messages) => [...messages, message]);
 	}
 });
+lobbyStore.subscribe((lobby) => {
+	if (!lobby) {
+		lobbyMessagesStore.set([]);
+	}
+});

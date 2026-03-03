@@ -34,6 +34,7 @@ export function initSocket(socket: Socket) {
     const lobby = getLobbyOfUser(id);
     if (lobby) {
       leaveLobby(lobby.id, id);
+      io.to(lobby.id).emit("member-update", lobby?.members);
     }
 
     console.log("Client disconnected:", socket.id);

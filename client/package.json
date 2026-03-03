@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --host",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
@@ -37,6 +37,7 @@
 	},
 	"dependencies": {
 		"@faker-js/faker": "^10.3.0",
+		"@lucide/svelte": "^0.576.0",
 		"daisyui": "^5.5.18",
 		"socket.io-client": "^4.8.3"
 	}
