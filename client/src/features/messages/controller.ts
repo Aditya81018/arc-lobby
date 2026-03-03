@@ -13,3 +13,15 @@ export function sendTextMessage(roomId: string, senderId: string, content: strin
 	};
 	socket.emit('send-message', message);
 }
+
+export function sendGameInvite(roomId: string, senderId: string, gameId: string) {
+	const message: Message = {
+		id: uuid(),
+		roomId,
+		senderId,
+		type: 'game-invite',
+		content: gameId,
+		timestamp: Date.now()
+	};
+	socket.emit('send-message', message);
+}

@@ -7,6 +7,7 @@
 	import { membersStore } from '../../features/lobby/store';
 	import { sendTextMessage } from '../../features/messages/controller';
 	import { lobbyMessagesStore } from '../../features/messages/store';
+	import SendGameInviteButton from '../../features/games/SendGameInviteButton.svelte';
 
 	const lobbyId = page.params.lobbyId!;
 	let message = $state('');
@@ -65,13 +66,13 @@
 	});
 </script>
 
-<div class="drawer h-screen bg-base-200 lg:drawer-open">
+<div class="drawer w-screen bg-base-200 lg:drawer-open">
 	<input id="member-drawer" type="checkbox" class="drawer-toggle" />
 
-	<div class="drawer-content flex h-screen flex-col overflow-hidden">
+	<div class="drawer-content flex h-svh flex-col overflow-hidden">
 		<header class="navbar shrink-0 border-b border-base-300 bg-base-100 px-4">
 			<div class="flex flex-1 gap-2">
-				<label for="member-drawer" class="btn btn-ghost btn-sm lg:hidden">
+				<label for="member-drawer" class="btn btn-square btn-ghost btn-sm lg:hidden">
 					<Menu />
 				</label>
 				<div class="flex flex-col justify-center">
@@ -127,13 +128,14 @@
 				handleSendTextMessage();
 			}}
 		>
+			<SendGameInviteButton />
 			<input
 				class="input-bordered input flex-1"
 				type="text"
 				placeholder="Type a message..."
 				bind:value={message}
 			/>
-			<button class="btn btn-square btn-primary" type="submit" disabled={!message.trim()}
+			<button class="btn btn-square btn-accent" type="submit" disabled={!message.trim()}
 				><Send /></button
 			>
 		</form>
