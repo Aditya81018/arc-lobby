@@ -3,26 +3,34 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
-	import { joinLobby, leaveLobby } from '../../features/lobby/controllers';
+	import { getMembersData, joinLobby, leaveLobby } from '../../features/lobby/controllers';
 	import { socket } from '$lib/socket';
-	import { lobbyStore } from '../../features/lobby/store';
+	import { lobbyStore, membersStore } from '../../features/lobby/store';
 
 	const { children } = $props();
 	const lobbyId = page.params.lobbyId!;
 	let isLoading = $state(true);
 
 	onMount(() => {
-		function handleMemberUpdate(members: string[]) {
-			if (!$lobbyStore) return;
+		async function handleMemberUpdate(members: string[]) {
+			if (!$lobbyStore) {
+				$membersStore = null;
+				return;
+			}
 			$lobbyStore.members = members;
+			console.log('member update', members);
+			$membersStore = await getMembersData($lobbyStore.id);
 		}
 
 		handle();
 		async function handle() {
 			const success = await joinLobby(lobbyId);
-			if (success) isLoading = false;
-			else goto(resolve('/'));
+			if (!success) {
+				return goto(resolve('/'));
+			}
 
+			isLoading = false;
+			$membersStore = await getMembersData(lobbyId);
 			socket.on('member-update', handleMemberUpdate);
 		}
 

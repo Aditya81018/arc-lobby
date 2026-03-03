@@ -1,6 +1,8 @@
 import { Socket } from "socket.io";
 import { createUser, deleteUser, UserData } from "../features/users";
 import { getLobbyById, getLobbyOfUser, joinLobby, leaveLobby } from "../features/lobbies";
+import { io } from "..";
+import { initMessageSockets } from "../features/message";
 
 export function initSocket(socket: Socket) {
   const id = socket.id;
@@ -13,7 +15,7 @@ export function initSocket(socket: Socket) {
     socket.join(lobbyId);
 
     const lobby = getLobbyById(lobbyId);
-    socket.to(lobbyId).emit("member-update", lobby?.members);
+    io.to(lobbyId).emit("member-update", lobby?.members);
   });
 
   socket.on("leave-lobby", (lobbyId) => {
@@ -21,8 +23,10 @@ export function initSocket(socket: Socket) {
     socket.leave(lobbyId);
 
     const lobby = getLobbyById(lobbyId);
-    socket.to(lobbyId).emit("member-update", lobby?.members);
+    io.to(lobbyId).emit("member-update", lobby?.members);
   });
+
+  initMessageSockets(socket);
 
   socket.on("disconnect", () => {
     deleteUser(id);

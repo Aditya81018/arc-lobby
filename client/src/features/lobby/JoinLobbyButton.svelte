@@ -1,3 +1,9 @@
+<!-- 
+	Accepts lobby id from input 
+	then checks if it exists and navigates to it
+	Note - it does not actually joins a lobby, it just checks if the lobby exists and navigates to it. Joining a lobby is handled in the lobby page itself.
+-->
+
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';

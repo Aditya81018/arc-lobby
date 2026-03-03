@@ -1,3 +1,5 @@
+<!-- Creates a lobby and navigates to it -->
+
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';

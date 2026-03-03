@@ -6,9 +6,9 @@ import { usersRouter } from "./features/users";
 import cors from "cors";
 import { lobbiesRouter } from "./features/lobbies";
 
-const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
+export const app = express();
+export const httpServer = createServer(app);
+export const io = new Server(httpServer, {
   cors: {
     origin: "*",
   },
