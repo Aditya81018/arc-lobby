@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { getUserById } from "./users";
+import { Socket } from "socket.io";
+import { io } from "..";
 
 export interface Lobby {
   id: string;
@@ -83,6 +85,24 @@ export function getLobbyMembersData(lobbyId: string) {
     membersData.push(getUserById(member));
   }
   return membersData;
+}
+
+export function initLobbySockets(socket: Socket) {
+  socket.on("join-lobby", (lobbyId) => {
+    joinLobby(lobbyId, socket.id);
+    socket.join(lobbyId);
+
+    const lobby = getLobbyById(lobbyId);
+    io.to(lobbyId).emit("member-update", lobby?.members);
+  });
+
+  socket.on("leave-lobby", (lobbyId) => {
+    leaveLobby(lobbyId, socket.id);
+    socket.leave(lobbyId);
+
+    const lobby = getLobbyById(lobbyId);
+    io.to(lobbyId).emit("member-update", lobby?.members);
+  });
 }
 
 // Routes

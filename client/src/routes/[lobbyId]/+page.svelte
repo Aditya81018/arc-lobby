@@ -10,6 +10,10 @@
 	import SendGameInviteButton from '../../features/games/SendGameInviteButton.svelte';
 	import { getLocalGameSessionById } from '../../features/game-sessions/controller';
 	import { getLocalGameById } from '../../features/games/controller';
+	import JoinGameSessionButton from '../../features/game-sessions/JoinGameSessionButton.svelte';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import SpectateGameSessionButton from '../../features/game-sessions/SpectateGameSessionButton.svelte';
 
 	const lobbyId = page.params.lobbyId!;
 	let message = $state('');
@@ -92,7 +96,7 @@
 			onscroll={handleScroll}
 			class="relative flex-1 space-y-4 overflow-y-auto p-4"
 		>
-			{#each $lobbyMessagesStore as msg}
+			{#each $lobbyMessagesStore as msg, i (i)}
 				{@const isMe = msg.senderId === socket.id}
 				<div class="chat {isMe ? 'chat-end' : 'chat-start'}">
 					<div class="chat-header mb-1 text-xs opacity-50">
@@ -111,7 +115,7 @@
 						{@const game = getLocalGameById(gameSession?.gameId)!}
 
 						{#if gameSession && game}
-							<div class="chat-bubble max-w-sm chat-bubble-accent p-4 shadow-lg">
+							<div class="chat-bubble max-w-sm p-4 shadow-lg">
 								<div class="flex items-start gap-3">
 									<div class="avatar">
 										<div class="h-12 w-12 rounded-lg bg-base-300 ring-1 ring-secondary-content/20">
@@ -125,7 +129,7 @@
 										</h3>
 
 										<div class="mt-2 flex flex-wrap gap-1">
-											{#each Object.entries(gameSession.settings) as [key, value]}
+											{#each Object.entries(gameSession.settings) as [key, value], i (i)}
 												<div
 													class="badge h-4 gap-1 border-none badge-ghost bg-black/10 px-1.5 py-0 text-[10px] opacity-80"
 												>
@@ -140,10 +144,8 @@
 								</div>
 
 								<div class="mt-4 grid grid-cols-2 gap-2">
-									<button onclick={() => {}} class="btn h-8 btn-xs btn-primary"> Join </button>
-									<button onclick={() => {}} class="btn h-8 btn-xs btn-secondary">
-										Spectate
-									</button>
+									<JoinGameSessionButton gameSessionId={gameSession.id} />
+									<SpectateGameSessionButton gameSessionId={gameSession.id} />
 								</div>
 							</div>
 						{:else}
@@ -198,7 +200,7 @@
 				<div class="badge badge-primary">{$membersStore?.length}</div>
 			</div>
 			<ul class="space-y-1 p-2">
-				{#each $membersStore as member}
+				{#each $membersStore as member, i (i)}
 					<li>
 						<div
 							class="flex items-center gap-3 {member.id === socket.id

@@ -1,8 +1,19 @@
 import { Socket } from "socket.io";
 import { createUser, deleteUser, UserData } from "../features/users";
-import { getLobbyById, getLobbyOfUser, joinLobby, leaveLobby } from "../features/lobbies";
+import {
+  getLobbyById,
+  getLobbyOfUser,
+  initLobbySockets,
+  joinLobby,
+  leaveLobby,
+} from "../features/lobbies";
 import { io } from "..";
 import { initMessageSockets } from "../features/message";
+import {
+  getGameSessionOfUser,
+  initGameSessionSockets,
+  removePlayerFromSession,
+} from "../features/game-sessions";
 
 export function initSocket(socket: Socket) {
   const id = socket.id;
@@ -10,23 +21,9 @@ export function initSocket(socket: Socket) {
 
   createUser(id, data);
 
-  socket.on("join-lobby", (lobbyId) => {
-    joinLobby(lobbyId, id);
-    socket.join(lobbyId);
-
-    const lobby = getLobbyById(lobbyId);
-    io.to(lobbyId).emit("member-update", lobby?.members);
-  });
-
-  socket.on("leave-lobby", (lobbyId) => {
-    leaveLobby(lobbyId, id);
-    socket.leave(lobbyId);
-
-    const lobby = getLobbyById(lobbyId);
-    io.to(lobbyId).emit("member-update", lobby?.members);
-  });
-
+  initLobbySockets(socket);
   initMessageSockets(socket);
+  initGameSessionSockets(socket);
 
   socket.on("disconnect", () => {
     deleteUser(id);
@@ -35,6 +32,11 @@ export function initSocket(socket: Socket) {
     if (lobby) {
       leaveLobby(lobby.id, id);
       io.to(lobby.id).emit("member-update", lobby?.members);
+    }
+    const gameSession = getGameSessionOfUser(id);
+    if (gameSession) {
+      removePlayerFromSession(gameSession.id, id);
+      io.to(gameSession.id).emit("players-update", gameSession?.players);
     }
 
     console.log("Client disconnected:", socket.id);

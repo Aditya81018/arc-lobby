@@ -2,10 +2,11 @@
 	import { Gamepad, X, ChevronLeft, Send } from '@lucide/svelte';
 	import type { Game } from './types';
 	import { sendGameSessionInvite } from '../messages/controller';
-	import { createGameSession } from '../game-sessions/controller';
+	import { createGameSession, joinGameSession } from '../game-sessions/controller';
 	import { page } from '$app/state';
 	import { userData } from '../user/store';
 	import { gamesStore } from './store';
+	import { goto } from '$app/navigation';
 
 	const lobbyId = page.params.lobbyId!;
 
@@ -52,6 +53,14 @@
 		const gameSession = await createGameSession(selectedGame!.id, lobbyId, settingsValues);
 		sendGameSessionInvite(lobbyId, $userData.id, gameSession.id);
 
+		const session = await joinGameSession(gameSession.id);
+		if (session) {
+			goto(`/${lobbyId}/${session.id}`);
+			return;
+		}
+
+		console.log('Failed to join game session');
+
 		closeModal();
 	};
 </script>
@@ -79,7 +88,7 @@
 		<div class="custom-scrollbar overflow-y-auto px-6 pb-6">
 			{#if !selectedGame}
 				<div class="grid grid-cols-2 gap-4 md:grid-cols-3">
-					{#each Object.values($gamesStore) as game}
+					{#each Object.values($gamesStore) as game, i (i)}
 						<button
 							onclick={() => handleGameSelect(game)}
 							class="group relative aspect-4/3 overflow-hidden rounded-2xl bg-base-300 transition-transform active:scale-95"
@@ -97,7 +106,7 @@
 				</div>
 			{:else}
 				<div class="divide-y divide-base-200">
-					{#each selectedGame.settings || [] as setting}
+					{#each selectedGame.settings || [] as setting, i (i)}
 						<div class="py-5 first:pt-0">
 							<label class="mb-3 block text-sm font-bold tracking-wider uppercase opacity-60">
 								{setting.name}
@@ -111,7 +120,7 @@
 								/>
 							{:else if setting.type === 'pick-one'}
 								<div class="flex flex-wrap gap-2">
-									{#each setting.options as option}
+									{#each setting.options as option, i (i)}
 										<button
 											class="no-animation btn rounded-lg font-medium btn-sm {settingsValues[
 												setting.id
@@ -126,7 +135,7 @@
 								</div>
 							{:else if setting.type === 'pick-many'}
 								<div class="flex flex-wrap gap-2">
-									{#each setting.options as option}
+									{#each setting.options as option, i (i)}
 										<button
 											class="no-animation btn rounded-lg font-medium btn-sm {settingsValues[
 												setting.id

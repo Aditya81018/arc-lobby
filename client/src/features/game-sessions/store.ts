@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import { lobbyStore } from '../lobby/store';
+import type { UserData } from '../user/store';
 
 export interface GameSession {
 	id: string;
@@ -11,6 +12,8 @@ export interface GameSession {
 }
 
 export const gameSessionsStore = writable<Map<string, GameSession>>(new Map());
+export const currentGameSessionStore = writable<GameSession | null>(null);
+export const currentGameSessionPlayersStore = writable<UserData[] | null>(null);
 
 lobbyStore.subscribe((lobby) => {
 	if (!lobby) {
