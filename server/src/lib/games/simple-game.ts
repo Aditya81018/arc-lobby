@@ -77,11 +77,18 @@ const simpleGame: SimpleGame = {
       data: this.getDefaultData(settings),
       state: "waiting",
       nextTurn() {
-        let turnOfPlayer;
+        let playerId, playerData;
         do {
           this.data.turnOf = (this.data.turnOf + 1) % this.players.length;
-          turnOfPlayer = this.players[this.data.turnOf];
-        } while (turnOfPlayer === undefined);
+          playerId = this.players[this.data.turnOf];
+          playerData = this.data.playersData[this.data.turnOf];
+        } while (
+          // while we couldn't find a player who
+          !(
+            playerId !== undefined && // haven't left the game and
+            playerData.lives > 0 // still have lives to play with
+          )
+        );
       },
     };
   },
