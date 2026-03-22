@@ -8,9 +8,11 @@
 	import { gamesStore } from './store';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import LoadingScreen from '../../components/LoadingScreen.svelte';
 
 	const lobbyId = page.params.lobbyId!;
 
+	let isLoading = $state(false);
 	let modalRef: HTMLDialogElement;
 
 	let selectedGame = $state<Game | null>(null);
@@ -43,6 +45,7 @@
 	};
 
 	const handleSendGameInvite = async () => {
+		isLoading = true;
 		const gameSession = await createGameSession(selectedGame!.id, lobbyId, settingsValues);
 		sendGameSessionInvite(lobbyId, $userData.id, gameSession.id);
 
@@ -52,7 +55,10 @@
 			return;
 		}
 
-		closeModal();
+		if (!session) {
+			closeModal();
+			isLoading = false;
+		}
 	};
 </script>
 
@@ -61,6 +67,9 @@
 </button>
 
 <dialog bind:this={modalRef} class="modal modal-bottom sm:modal-middle">
+	{#if isLoading}
+		<LoadingScreen />
+	{/if}
 	<div class="modal-box flex max-h-[85vh] max-w-xl flex-col overflow-hidden p-0">
 		<div class="flex items-center justify-between bg-base-100 px-6 py-4">
 			<div class="flex items-center gap-3">
@@ -149,7 +158,11 @@
 
 		{#if selectedGame}
 			<div class="bg-base-100 p-6 pt-2">
-				<button class="btn h-12 btn-block shadow-md btn-primary" onclick={handleSendGameInvite}>
+				<button
+					class="btn h-12 btn-block shadow-md btn-primary"
+					disabled={isLoading}
+					onclick={handleSendGameInvite}
+				>
 					<Send size={18} class="mr-2" />
 					Send Game Invite
 				</button>

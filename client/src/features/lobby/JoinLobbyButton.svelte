@@ -27,8 +27,10 @@
 		isLoading = true;
 		const lobby = await getLobbyById(lobbyId);
 		if (lobby) goto(resolve(`/${lobbyId}`));
-		else alertMessage = 'Invalid Lobby Id';
-		isLoading = false;
+		else {
+			alertMessage = 'Invalid Lobby Id';
+			isLoading = false;
+		}
 	}
 </script>
 

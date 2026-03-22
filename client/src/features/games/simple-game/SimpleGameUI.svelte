@@ -16,12 +16,13 @@
 		isPlayer: boolean;
 	} = $props();
 
-	let isUserTurn = $derived(session.players[session.data.turnOf] === $user.id);
-	let isOptionsEnabled = $derived(isUserTurn && session.state === 'ongoing');
+	let isPlayerTurn = $derived(session.players[session.data.turnOf] === $user.id);
+	let isOptionsEnabled = $derived(isPlayerTurn && session.state === 'ongoing');
 
 	function handleOptionSelect(number: number) {
 		if (!isPlayer || session.state !== 'ongoing') return;
 		return () => {
+			isPlayerTurn = false;
 			socket.emit('option-select', number);
 		};
 	}

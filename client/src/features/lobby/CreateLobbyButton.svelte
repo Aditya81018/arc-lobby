@@ -12,7 +12,7 @@
 		const lobby = await createLobby();
 
 		goto(resolve(`/${lobby.id}`));
-		isLoading = false;
+		if (!lobby) isLoading = false;
 	}
 </script>
 

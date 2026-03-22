@@ -44,10 +44,10 @@
 				return goto(resolve('/'));
 			}
 
-			isLoading = false;
 			$membersStore = await getMembersData(lobbyId);
 			socket.on('member-update', handleMemberUpdate);
 			socket.on('game-session-update', handleGameSessionUpdate);
+			isLoading = false;
 		}
 
 		return () => {
