@@ -13,5 +13,7 @@
 <div class="flex h-svh w-screen flex-col">
 	{#if $session?.gameId === 'simple-game'}
 		<SimpleGameUI session={$session as SimpleGameSession} players={$players!} {isPlayer} />
+	{:else}
+		No session
 	{/if}
 </div>

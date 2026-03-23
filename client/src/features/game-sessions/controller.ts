@@ -1,6 +1,6 @@
 import request from '$lib/request';
 import { get } from 'svelte/store';
-import { currentGameSessionStore, type GameSession } from './store';
+import { type GameSession } from './store';
 import { userData, type UserData } from '../user/store';
 
 export async function createGameSession(
@@ -26,16 +26,16 @@ export async function joinGameSession(gameSessionId: string): Promise<GameSessio
 	const gameSession = await request<GameSession>(`/game-sessions/${gameSessionId}/join`, 'POST', {
 		playerId
 	});
-	currentGameSessionStore.set(gameSession);
+	// currentGameSessionStore.set(gameSession);
 	return gameSession;
 }
 
-export async function leaveGameSession(gameSessionId: string): Promise<GameSession> {
+export async function leaveGameSession(gameSessionId: string): Promise<GameSession | undefined> {
 	const playerId = get(userData).id;
 	const gameSession = await request<GameSession>(`/game-sessions/${gameSessionId}/leave`, 'POST', {
 		playerId
 	});
-	currentGameSessionStore.set(null);
+	console.log('leave session set to null', gameSession);
 	return gameSession;
 }
 

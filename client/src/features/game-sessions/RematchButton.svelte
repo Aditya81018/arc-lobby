@@ -48,20 +48,22 @@
 	async function handleAcceptRematch() {
 		if (!incomingRequest) return;
 
-		isLoading = true;
-
-		const joinedSession = await joinGameSession(incomingRequest.newSessionId);
-		if (joinedSession) {
-			goto(
-				resolve(
-					`/${joinedSession.lobbyId}/redirect?to=${`/${joinedSession.lobbyId}/${joinedSession.id}`}`
-				)
-			);
-			return;
-		}
-
-		if (!joinedSession) {
-			isLoading = false;
+		try {
+			isLoading = true;
+			const joinedSession = await joinGameSession(incomingRequest.newSessionId);
+			if (joinedSession) {
+				goto(
+					resolve(
+						`/${joinedSession.lobbyId}/redirect?to=${`/${joinedSession.lobbyId}/${joinedSession.id}`}`
+					)
+				);
+				return;
+			}
+			if (!joinedSession) {
+				isLoading = false;
+			}
+		} catch {
+			goto(resolve(`/${session.lobbyId}`));
 		}
 	}
 
