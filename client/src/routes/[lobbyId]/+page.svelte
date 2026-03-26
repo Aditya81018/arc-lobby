@@ -15,6 +15,7 @@
 	import { userData } from '../../features/user/store';
 	import UserAvatar from '../../components/UserAvatar.svelte';
 	import { gamesStore } from '../../features/games/store';
+	import { onMount } from 'svelte';
 
 	const lobbyId = page.params.lobbyId!;
 	let message = $state('');
@@ -32,18 +33,18 @@
 	function isNearBottom() {
 		if (!messagesContainer) return true;
 
-		const threshold = 120; // px
+		const threshold = 250; // px
 		const { scrollTop, scrollHeight, clientHeight } = messagesContainer;
 
 		return scrollHeight - (scrollTop + clientHeight) < threshold;
 	}
 
-	function scrollToBottom() {
+	function scrollToBottom(behavior: ScrollBehavior = 'smooth') {
 		if (!messagesContainer) return;
 
 		messagesContainer.scrollTo({
 			top: messagesContainer.scrollHeight,
-			behavior: 'smooth'
+			behavior
 		});
 
 		showScrollButton = false;
@@ -69,7 +70,13 @@
 		// Otherwise only scroll if near bottom
 		if (isNearBottom()) {
 			scrollToBottom();
+		} else {
+			showScrollButton = true;
 		}
+	});
+
+	onMount(() => {
+		scrollToBottom('instant');
 	});
 </script>
 
@@ -193,7 +200,7 @@
 		{#if showScrollButton}
 			<button
 				class="btn fixed right-6 bottom-24 btn-circle shadow-lg btn-primary"
-				onclick={scrollToBottom}
+				onclick={() => scrollToBottom()}
 			>
 				<ArrowDown size={16} />
 			</button>
